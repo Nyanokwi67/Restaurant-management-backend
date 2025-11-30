@@ -1,0 +1,190 @@
+### Base URL
+@baseUrl = http://localhost:3000
+@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiYWRtaW4iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjQzMTYwNDYsImV4cCI6MTc2NDkyMDg0Nn0.Y-4NdTwVu-pGqqQKxZWgCF1P-zmksN2wHYsOmJ63nDE
+### ===== AUTHENTICATION =====
+
+### Login as Admin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin123"
+}
+
+### Login as Manager
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "manager1",
+  "password": "manager123"
+}
+
+### Login as Waiter
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "waiter1",
+  "password": "waiter123"
+}
+
+### ===== USERS (Protected - Admin & Manager only) =====
+
+### Get all users (requires auth)
+GET {{baseUrl}}/users
+Authorization: Bearer {{token}}
+
+### Get user by ID
+GET {{baseUrl}}/users/1
+Authorization: Bearer {{token}}
+
+### Create a new user (Admin only)
+POST {{baseUrl}}/users
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "username": "testwaiter",
+  "password": "test123",
+  "name": "Test Waiter",
+  "role": "waiter",
+  "active": true
+}
+
+### Update user
+PATCH {{baseUrl}}/users/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Updated Admin User"
+}
+
+### Delete user
+DELETE {{baseUrl}}/users/4
+Authorization: Bearer {{token}}
+
+### ===== MENU ITEMS =====
+
+### Get all menu items
+GET {{baseUrl}}/menu-items
+
+### Create menu item - Cappuccino
+POST {{baseUrl}}/menu-items
+Content-Type: application/json
+
+{
+  "name": "Cappuccino",
+  "price": 350,
+  "category": "Drinks",
+  "available": true
+}
+
+### Create menu item - Burger
+POST {{baseUrl}}/menu-items
+Content-Type: application/json
+
+{
+  "name": "Burger & Fries",
+  "price": 850,
+  "category": "Meals",
+  "available": true
+}
+
+### Update menu item
+PATCH {{baseUrl}}/menu-items/1
+Content-Type: application/json
+
+{
+  "price": 400,
+  "available": false
+}
+
+### ===== TABLES =====
+
+### Get all tables
+GET {{baseUrl}}/tables
+
+### Create table 1
+POST {{baseUrl}}/tables
+Content-Type: application/json
+
+{
+  "number": 1,
+  "seats": 4,
+  "status": "free"
+}
+
+### Create table 4
+POST {{baseUrl}}/tables
+Content-Type: application/json
+
+{
+  "number": 4,
+  "seats": 2,
+  "status": "free"
+}
+
+### Update table status
+PATCH {{baseUrl}}/tables/1
+Content-Type: application/json
+
+{
+  "status": "occupied"
+}
+
+### ===== ORDERS =====
+
+### Get all orders
+GET {{baseUrl}}/orders
+
+### Create an order
+POST {{baseUrl}}/orders
+Content-Type: application/json
+
+{
+  "tableId": 1,
+  "tableNumber": 1,
+  "waiterId": 3,
+  "waiterName": "Sarah Waiter",
+  "items": "[{\"id\":1,\"name\":\"Cappuccino\",\"price\":350,\"quantity\":2}]",
+  "total": 700,
+  "status": "open"
+}
+
+### Update order to paid
+PATCH {{baseUrl}}/orders/1
+Content-Type: application/json
+
+{
+  "status": "paid",
+  "paymentMethod": "cash"
+}
+
+### ===== EXPENSES =====
+
+### Get all expenses
+GET {{baseUrl}}/expenses
+
+### Create an expense
+POST {{baseUrl}}/expenses
+Content-Type: application/json
+
+{
+  "description": "Weekly vegetable purchase",
+  "amount": 5000,
+  "category": "Inventory",
+  "submittedBy": "John Manager",
+  "status": "pending",
+  "date": "2025-11-27"
+}
+
+### Update expense status (approve)
+PATCH {{baseUrl}}/expenses/1
+Content-Type: application/json
+
+{
+  "status": "approved"
+}
