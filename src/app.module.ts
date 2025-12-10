@@ -1,23 +1,25 @@
+// src/app.module.ts
+
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
-import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
-import { TablesModule } from './tables/tables.module';
+import { UsersModule } from './users/users.module';
 import { MenuItemsModule } from './menu-items/menu-items.module';
+import { TablesModule } from './tables/tables.module';
 import { OrdersModule } from './orders/orders.module';
 import { MpesaModule } from './mpesa/mpesa.module';
+import { PaymentsModule } from './payment/payment.module'; 
+import { ExpensesModule } from './expenses/expenses.module';  
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'mssql',
-      host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT || '1433', 10),
-      username: process.env.DB_USERNAME || 'sa',
-      password: process.env.DB_PASSWORD || 'YourPassword123',
-      database: process.env.DB_NAME || 'RestaurantDB',
+      host: 'localhost',
+      port: 1433,
+      username: 'restaurant_user',
+      password: 'Restaurant@2024',
+      database: 'restaurant_management',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
       options: {
@@ -25,12 +27,14 @@ import { MpesaModule } from './mpesa/mpesa.module';
         trustServerCertificate: true,
       },
     }),
-    UsersModule,
     AuthModule,
-    TablesModule,
+    UsersModule,
     MenuItemsModule,
+    TablesModule,
     OrdersModule,
     MpesaModule,
+    PaymentsModule, 
+    ExpensesModule,  
   ],
 })
 export class AppModule {}

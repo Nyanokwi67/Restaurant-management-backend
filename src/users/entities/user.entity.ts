@@ -1,31 +1,28 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+// src/users/entities/user.entity.ts
+
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Order } from '../../orders/entities/order.entity';
 
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true, length: 50 })
-  username: string;
-
-  @Column({ length: 255 })
-  password: string;
-
-  @Column({ length: 100 })
+  @Column()
   name: string;
 
-  @Column({
-    type: 'nvarchar',
-    length: 20,
-  })
-  role: 'admin' | 'manager' | 'waiter';
+  @Column({ unique: true })
+  username: string;
+
+  @Column()
+  password: string;
+
+  @Column()
+  role: string;
 
   @Column({ default: true })
   active: boolean;
 
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
+  @OneToMany(() => Order, (order) => order.waiter)
+  orders: Order[];
 }

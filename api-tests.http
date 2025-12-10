@@ -1,6 +1,7 @@
 ### Base URL
 @baseUrl = http://localhost:3000
-@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiYWRtaW4iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjQzMTYwNDYsImV4cCI6MTc2NDkyMDg0Nn0.Y-4NdTwVu-pGqqQKxZWgCF1P-zmksN2wHYsOmJ63nDE
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzY1Mjc0MTYwLCJleHAiOjE3NjUzNjA1NjB9.cq-ubasPZqt3OrTXvMhOEu5WSL0haBteqAew4gQWzSg
+
 ### ===== AUTHENTICATION =====
 
 ### Login as Admin
@@ -17,7 +18,7 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "username": "manager1",
+  "username": "manager",
   "password": "manager123"
 }
 
@@ -26,8 +27,43 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "username": "waiter1",
+  "username": "waiter",
   "password": "waiter123"
+}
+
+### ===== CREATE INITIAL ADMIN (NO AUTH NEEDED) =====
+
+### Create Admin User (First time setup)
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "name": "Admin User",
+  "username": "admin",
+  "password": "admin123",
+  "role": "admin"
+}
+
+### Create Manager User
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "name": "Manager John",
+  "username": "manager",
+  "password": "manager123",
+  "role": "manager"
+}
+
+### Create Waiter User
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "name": "Waiter Mary",
+  "username": "waiter",
+  "password": "waiter123",
+  "role": "waiter"
 }
 
 ### ===== USERS (Protected - Admin & Manager only) =====
@@ -40,17 +76,16 @@ Authorization: Bearer {{token}}
 GET {{baseUrl}}/users/1
 Authorization: Bearer {{token}}
 
-### Create a new user (Admin only)
+### Create a new user (Admin only - with token)
 POST {{baseUrl}}/users
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
+  "name": "Test Waiter",
   "username": "testwaiter",
   "password": "test123",
-  "name": "Test Waiter",
-  "role": "waiter",
-  "active": true
+  "role": "waiter"
 }
 
 ### Update user
@@ -71,25 +106,50 @@ Authorization: Bearer {{token}}
 ### Get all menu items
 GET {{baseUrl}}/menu-items
 
+### Get menu item by ID
+GET {{baseUrl}}/menu-items/1
+
 ### Create menu item - Cappuccino
 POST {{baseUrl}}/menu-items
 Content-Type: application/json
 
 {
   "name": "Cappuccino",
-  "price": 350,
+  "price": 150,
   "category": "Drinks",
   "available": true
 }
 
-### Create menu item - Burger
+### Create menu item - Espresso
 POST {{baseUrl}}/menu-items
 Content-Type: application/json
 
 {
-  "name": "Burger & Fries",
-  "price": 850,
+  "name": "Espresso",
+  "price": 100,
+  "category": "Drinks",
+  "available": true
+}
+
+### Create menu item - Beef Burger
+POST {{baseUrl}}/menu-items
+Content-Type: application/json
+
+{
+  "name": "Beef Burger",
+  "price": 500,
   "category": "Meals",
+  "available": true
+}
+
+### Create menu item - Chocolate Cake
+POST {{baseUrl}}/menu-items
+Content-Type: application/json
+
+{
+  "name": "Chocolate Cake",
+  "price": 300,
+  "category": "Desserts",
   "available": true
 }
 
@@ -98,14 +158,20 @@ PATCH {{baseUrl}}/menu-items/1
 Content-Type: application/json
 
 {
-  "price": 400,
-  "available": false
+  "price": 180,
+  "available": true
 }
+
+### Delete menu item
+DELETE {{baseUrl}}/menu-items/1
 
 ### ===== TABLES =====
 
 ### Get all tables
 GET {{baseUrl}}/tables
+
+### Get table by ID
+GET {{baseUrl}}/tables/1
 
 ### Create table 1
 POST {{baseUrl}}/tables
@@ -113,6 +179,26 @@ Content-Type: application/json
 
 {
   "number": 1,
+  "seats": 2,
+  "status": "free"
+}
+
+### Create table 2
+POST {{baseUrl}}/tables
+Content-Type: application/json
+
+{
+  "number": 2,
+  "seats": 4,
+  "status": "free"
+}
+
+### Create table 3
+POST {{baseUrl}}/tables
+Content-Type: application/json
+
+{
+  "number": 3,
   "seats": 4,
   "status": "free"
 }
@@ -123,7 +209,7 @@ Content-Type: application/json
 
 {
   "number": 4,
-  "seats": 2,
+  "seats": 6,
   "status": "free"
 }
 
@@ -135,10 +221,16 @@ Content-Type: application/json
   "status": "occupied"
 }
 
+### Delete table
+DELETE {{baseUrl}}/tables/1
+
 ### ===== ORDERS =====
 
 ### Get all orders
 GET {{baseUrl}}/orders
+
+### Get order by ID
+GET {{baseUrl}}/orders/1
 
 ### Create an order
 POST {{baseUrl}}/orders
@@ -146,15 +238,25 @@ Content-Type: application/json
 
 {
   "tableId": 1,
-  "tableNumber": 1,
   "waiterId": 3,
-  "waiterName": "Sarah Waiter",
-  "items": "[{\"id\":1,\"name\":\"Cappuccino\",\"price\":350,\"quantity\":2}]",
-  "total": 700,
+  "items": "[{\"id\":1,\"name\":\"Cappuccino\",\"price\":150,\"quantity\":2},{\"id\":2,\"name\":\"Beef Burger\",\"price\":500,\"quantity\":1}]",
+  "total": 800,
   "status": "open"
 }
 
-### Update order to paid
+### Create another order (Table 2)
+POST {{baseUrl}}/orders
+Content-Type: application/json
+
+{
+  "tableId": 2,
+  "waiterId": 3,
+  "items": "[{\"id\":3,\"name\":\"Chocolate Cake\",\"price\":300,\"quantity\":1}]",
+  "total": 300,
+  "status": "open"
+}
+
+### Update order status to paid
 PATCH {{baseUrl}}/orders/1
 Content-Type: application/json
 
@@ -163,28 +265,158 @@ Content-Type: application/json
   "paymentMethod": "cash"
 }
 
-### ===== EXPENSES =====
-
-### Get all expenses
-GET {{baseUrl}}/expenses
-
-### Create an expense
-POST {{baseUrl}}/expenses
+### Update order payment method
+PATCH {{baseUrl}}/orders/1
 Content-Type: application/json
 
 {
-  "description": "Weekly vegetable purchase",
-  "amount": 5000,
-  "category": "Inventory",
-  "submittedBy": "John Manager",
-  "status": "pending",
-  "date": "2025-11-27"
+  "paymentMethod": "mpesa"
 }
 
-### Update expense status (approve)
-PATCH {{baseUrl}}/expenses/1
+### Delete order
+DELETE {{baseUrl}}/orders/1
+
+### ===== M-PESA PAYMENT =====
+
+### Initiate M-Pesa payment
+POST {{baseUrl}}/mpesa/stk-push
 Content-Type: application/json
 
 {
-  "status": "approved"
+  "phoneNumber": "254712345678",
+  "amount": 1000,
+  "orderId": 1
 }
+
+### M-Pesa callback (Simulated - normally called by Safaricom)
+POST {{baseUrl}}/mpesa/callback
+Content-Type: application/json
+
+{
+  "Body": {
+    "stkCallback": {
+      "MerchantRequestID": "12345",
+      "CheckoutRequestID": "ws_CO_12345",
+      "ResultCode": 0,
+      "ResultDesc": "The service request is processed successfully."
+    }
+  }
+}
+
+### ===== QUICK SETUP SEQUENCE =====
+
+### 1. Create Admin (RUN THIS FIRST)
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "name": "Admin User",
+  "username": "admin",
+  "password": "admin123",
+  "role": "admin"
+}
+
+### 2. Create Manager
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "name": "Manager John",
+  "username": "manager",
+  "password": "manager123",
+  "role": "manager"
+}
+
+### 3. Create Waiter
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "name": "Waiter Mary",
+  "username": "waiter",
+  "password": "waiter123",
+  "role": "waiter"
+}
+
+### 4. Create Tables
+POST {{baseUrl}}/tables
+Content-Type: application/json
+
+{
+  "number": 1,
+  "seats": 2,
+  "status": "free"
+}
+
+###
+POST {{baseUrl}}/tables
+Content-Type: application/json
+
+{
+  "number": 2,
+  "seats": 4,
+  "status": "free"
+}
+
+###
+POST {{baseUrl}}/tables
+Content-Type: application/json
+
+{
+  "number": 3,
+  "seats": 4,
+  "status": "free"
+}
+
+### 5. Create Menu Items
+POST {{baseUrl}}/menu-items
+Content-Type: application/json
+
+{
+  "name": "Cappuccino",
+  "price": 150,
+  "category": "Drinks",
+  "available": true
+}
+
+###
+POST {{baseUrl}}/menu-items
+Content-Type: application/json
+
+{
+  "name": "Beef Burger",
+  "price": 500,
+  "category": "Meals",
+  "available": true
+}
+
+###
+POST {{baseUrl}}/menu-items
+Content-Type: application/json
+
+{
+  "name": "Chocolate Cake",
+  "price": 300,
+  "category": "Desserts",
+  "available": true
+}
+
+### 6. Login as Admin to get token
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin123"
+}
+
+### 7. Copy token from response above and paste it at the top:
+### @token = YOUR_TOKEN_HERE
+
+### ===== HEALTH CHECK =====
+
+### Check if API is running
+GET {{baseUrl}}/
+
+### Check database connection
+GET {{baseUrl}}/users

@@ -1,4 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+// src/tables/entities/table.entity.ts
+
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Order } from '../../orders/entities/order.entity';
 
 @Entity('tables')
 export class Table {
@@ -11,16 +14,13 @@ export class Table {
   @Column()
   seats: number;
 
-  @Column({
-    type: 'nvarchar',
+  @Column({ 
+    type: 'varchar',
     length: 20,
-    default: 'free'
+    default: 'free' 
   })
-  status: 'free' | 'occupied';
+  status: string;
 
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
+  @OneToMany(() => Order, (order) => order.table)
+  orders: Order[];
 }

@@ -1,52 +1,62 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+// src/orders/entities/order.entity.ts
+
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Table } from '../../tables/entities/table.entity';
+import { Payment } from '../../payment/entities/payment.entity';
 
 @Entity('orders')
 export class Order {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @ManyToOne(() => Table, (table) => table.orders)
+  @JoinColumn({ name: 'tableId' })
+  table: Table;
+
   @Column()
   tableId: number;
 
-  @Column()
-  tableNumber: number;
+  @ManyToOne(() => User, (user) => user.orders)
+  @JoinColumn({ name: 'waiterId' })
+  waiter: User;
 
   @Column()
   waiterId: number;
 
-  @Column({ length: 100 })
-  waiterName: string;
-
   @Column('text')
-  items: string; // We'll store order items as JSON string
+  items: string;
 
   @Column('decimal', { precision: 10, scale: 2 })
   total: number;
 
   @Column({
-    type: 'nvarchar',
+    type: 'varchar',
     length: 20,
-    default: 'open'
+    default: 'open',
   })
-  status: 'open' | 'paid';
+  status: string;
 
-  @Column({ length: 20, nullable: true })
+  @Column({
+    type: 'varchar',
+    length: 20,
+    nullable: true,
+    default: null,
+  })
   paymentMethod: string;
+
+  // One Order has Many Payments
+  @OneToMany(() => Payment, (payment) => payment.order)
+  payments: Payment[];
 
   @CreateDateColumn()
   timestamp: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
-
-
-  @ManyToOne(() => User, { nullable: true })
-  @JoinColumn({ name: 'waiterId' })
-  waiter: User;
-
-  @ManyToOne(() => Table, { nullable: true })
-  @JoinColumn({ name: 'tableId' })
-  table: Table;
 }

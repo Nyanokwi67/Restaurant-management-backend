@@ -1,37 +1,45 @@
-import { Injectable } from '@nestjs/common';
+// src/menu-items/menu-items.service.ts
+
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { MenuItem } from './entities/menu-item.entity';
 import { CreateMenuItemDto } from './dto/create-menu-item.dto';
 import { UpdateMenuItemDto } from './dto/update-menu-item.dto';
-import { MenuItem } from './entities/menu-item.entity';
 
 @Injectable()
 export class MenuItemsService {
   constructor(
     @InjectRepository(MenuItem)
-    private readonly menuItemRepository: Repository<MenuItem>,
+    private menuItemRepository: Repository<MenuItem>,
   ) {}
 
-  create(createMenuItemDto: CreateMenuItemDto) {
+  async create(createMenuItemDto: CreateMenuItemDto) {
     const menuItem = this.menuItemRepository.create(createMenuItemDto);
-    return this.menuItemRepository.save(menuItem);
+    return await this.menuItemRepository.save(menuItem);
   }
 
-  findAll() {
-    return this.menuItemRepository.find();
+  async findAll() {
+    return await this.menuItemRepository.find();
   }
 
-  findOne(id: number) {
-    return this.menuItemRepository.findOne({ where: { id } });
+  async findOne(id: number) {
+    const menuItem = await this.menuItemRepository.findOne({ where: { id } });
+    if (!menuItem) {
+      throw new NotFoundException(`Menu item with ID ${id} not found`);
+    }
+    return menuItem;
   }
 
   async update(id: number, updateMenuItemDto: UpdateMenuItemDto) {
-    await this.menuItemRepository.update(id, updateMenuItemDto);
-    return this.findOne(id);
+    const menuItem = await this.findOne(id);
+    Object.assign(menuItem, updateMenuItemDto);
+    return await this.menuItemRepository.save(menuItem);
   }
 
   async remove(id: number) {
+    const menuItem = await this.findOne(id);
     await this.menuItemRepository.delete(id);
-    return { deleted: true };
+    return { message: 'Menu item deleted successfully' };
   }
 }

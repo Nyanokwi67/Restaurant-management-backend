@@ -1,10 +1,14 @@
+// src/mpesa/mpesa.module.ts
+
 import { Module } from '@nestjs/common';
-import { MpesaService } from './mpesa.services';
-import { MpesaController } from './mpesa.cpntroller';
+import { AuthModule } from '../auth/auth.module';
+import { MpesaController } from './mpesa.controller';
+import { MpesaService } from './mpesa.service';
 
 @Module({
+  imports: [AuthModule],
   controllers: [MpesaController],
   providers: [MpesaService],
-  exports: [MpesaService],
 })
 export class MpesaModule {}
+

@@ -1,31 +1,44 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity('expenses')
 export class Expense {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 255 })
+  @Column()
   description: string;
 
   @Column('decimal', { precision: 10, scale: 2 })
   amount: number;
 
-  @Column({ length: 50 })
-  category: string;
+  @Column({
+    type: 'varchar',
+    length: 50,
+  })
+  category: string; // 'Inventory' | 'Utilities' | 'Salaries' | 'Maintenance' | 'Other'
 
-  @Column({ length: 100 })
-  submittedBy: string;
+  @Column()
+  submittedBy: string; // Name of person who submitted
 
   @Column({
-    type: 'nvarchar',
+    type: 'varchar',
     length: 20,
-    default: 'pending'
+    default: 'pending',
   })
-  status: 'pending' | 'approved' | 'rejected';
+  status: string; // 'pending' | 'approved' | 'rejected'
 
-  @Column({ type: 'datetime' })
+  @Column({ type: 'date' })
   date: Date;
+
+  @Column({ nullable: true })
+  approvedBy: string; // Name of admin/manager who approved
 
   @CreateDateColumn()
   createdAt: Date;

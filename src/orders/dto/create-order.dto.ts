@@ -1,32 +1,29 @@
-import { IsNumber, IsString, IsNotEmpty, IsEnum, IsOptional, Min } from 'class-validator';
+// src/orders/dto/create-order.dto.ts
+
+import { IsNotEmpty, IsNumber, IsString, IsOptional } from 'class-validator';
 
 export class CreateOrderDto {
+  @IsNotEmpty()
   @IsNumber()
   tableId: number;
 
-  @IsNumber()
-  tableNumber: number;
-
+  @IsNotEmpty()
   @IsNumber()
   waiterId: number;
 
-  @IsString()
   @IsNotEmpty()
-  waiterName: string;
-
   @IsString()
-  @IsNotEmpty()
-  items: string; // JSON string of order items
+  items: string;
 
+  @IsNotEmpty()
   @IsNumber()
-  @Min(0)
   total: number;
 
-  @IsEnum(['open', 'paid'])
   @IsOptional()
-  status?: 'open' | 'paid';
-
   @IsString()
+  status?: string;
+
   @IsOptional()
+  @IsString()
   paymentMethod?: string;
 }

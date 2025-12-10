@@ -1,27 +1,30 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+// src/mpesa/mpesa.service.ts
+
+import { Injectable, HttpException, HttpStatus, Logger } from '@nestjs/common';
 import axios from 'axios';
 
 @Injectable()
 export class MpesaService {
+  private readonly logger = new Logger(MpesaService.name);
   private readonly consumerKey = process.env.MPESA_CONSUMER_KEY;
   private readonly consumerSecret = process.env.MPESA_CONSUMER_SECRET;
   private readonly shortCode = process.env.MPESA_SHORTCODE || '174379';
   private readonly passkey = process.env.MPESA_PASSKEY || 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919';
-  private readonly callbackUrl = process.env.MPESA_CALLBACK_URL || 'http://localhost:3000/api/mpesa/callback';
+  private readonly callbackUrl = process.env.MPESA_CALLBACK_URL || 'http://localhost:3000/mpesa/callback';
   private readonly environment = process.env.MPESA_ENVIRONMENT || 'sandbox';
-  private readonly useDemoMode = process.env.MPESA_DEMO_MODE === 'true';
+  private readonly useDemoMode = process.env.MPESA_DEMO_MODE === 'true' || true;  // ✅ Default to demo mode
 
   async initiateSTKPush(phoneNumber: string, amount: number, accountReference: string, transactionDesc: string) {
-    console.log('===========================================');
-    console.log('M-PESA STK PUSH REQUEST');
-    console.log('Phone:', phoneNumber);
-    console.log('Amount: KES', amount);
-    console.log('Reference:', accountReference);
-    console.log('Demo Mode:', this.useDemoMode);
-    console.log('===========================================');
+    this.logger.log('===========================================');
+    this.logger.log('M-PESA STK PUSH REQUEST');
+    this.logger.log(`Phone: ${phoneNumber}`);
+    this.logger.log(`Amount: KES ${amount}`);
+    this.logger.log(`Reference: ${accountReference}`);
+    this.logger.log(`Demo Mode: ${this.useDemoMode}`);
+    this.logger.log('===========================================');
     
     if (this.useDemoMode) {
-      console.log('USING DEMO MODE - Simulating successful payment');
+      this.logger.log('USING DEMO MODE - Simulating successful payment');
       
       await new Promise(resolve => setTimeout(resolve, 2000));
       
@@ -75,7 +78,7 @@ export class MpesaService {
         },
       );
 
-      console.log('STK Push Response:', JSON.stringify(response.data, null, 2));
+      this.logger.log('STK Push Response: ' + JSON.stringify(response.data, null, 2));
 
       return {
         success: true,
@@ -83,7 +86,7 @@ export class MpesaService {
         data: response.data,
       };
     } catch (error: any) {
-      console.error('M-Pesa STK Push Error:', error.response?.data || error.message);
+      this.logger.error('M-Pesa STK Push Error: ' + (error.response?.data || error.message));
       
       throw new HttpException(
         'M-Pesa service temporarily unavailable. Please use cash or card payment.',
@@ -117,7 +120,7 @@ export class MpesaService {
   }
 
   async handleCallback(callbackData: any) {
-    console.log('M-Pesa Callback Received:', JSON.stringify(callbackData, null, 2));
+    this.logger.log('M-Pesa Callback Received: ' + JSON.stringify(callbackData, null, 2));
 
     try {
       const { Body } = callbackData;
